@@ -1,40 +1,32 @@
-// src/redux/tasksSlice.js
-import { nanoid } from "nanoid";
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, nanoid } from "@reduxjs/toolkit";
 
-const tasksSlice = createSlice({
-  name: "tasks",
-  initialState: [],
+const contactsSlice = createSlice({
+  name: "contacts",
+  initialState: {
+    items: [],
+  },
   reducers: {
-    addTask: {
+    addContact: {
       reducer(state, action) {
-        state.push(action.payload);
+        state.items.push(action.payload);
       },
-      prepare(text) {
+      prepare(username, number) {
         return {
           payload: {
-            text,
             id: nanoid(),
-            completed: false
+            username,
+            number,
           }
         };
       }
     },
-    deleteTask(state, action) {
-      const index = state.findIndex((task) => task.id === action.payload);
-      state.splice(index, 1);
+    deleteContact(state, action) {
+      const index = state.items.findIndex((item) => item.id === action.payload);
+      state.items.splice(index, 1);
     },
-    toggleCompleted(state, action) {
-      for (const task of state) {
-        if (task.id === action.payload) {
-          task.completed = !task.completed;
-          break;
-        }
-      }
-    }
   }
 });
 
-// Експортуємо генератори екшенів та редюсер
-export const { addTask, deleteTask, toggleCompleted } = tasksSlice.actions;
-export const tasksReducer = tasksSlice.reducer;
+export const { addContact, deleteContact } = contactsSlice.actions;
+export const contactsReducer = contactsSlice.reducer;
+export const selectContacts = (store) => store.contacts.items;
