@@ -9,9 +9,9 @@ const ContactList = () => {
   const filter = useSelector(selectFilter);
   const dispatch = useDispatch();
 
-  const filteredContacts = contacts.filter(contact =>
-    contact.username.toLowerCase().includes(filter.toLowerCase()),
-  );
+  const filteredContacts =  contacts && filter
+  ? contacts.filter(item => item.name.toLowerCase().includes(filter.toLowerCase()))
+  : contacts;
 
   return (
     <ul className={css.list}>
