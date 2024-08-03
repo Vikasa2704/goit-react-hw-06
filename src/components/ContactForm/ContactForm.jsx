@@ -1,70 +1,54 @@
-import { useId } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import css from './ContactForm.module.css'
 import { useDispatch } from 'react-redux';
-import { addContact } from '../../redux/contactsSlice';
-import css from "./ContactForm.module.css";
-
-const ContactSchema = Yup.object().shape({
-  username: Yup.string()
-    .min(3, 'The "Name" is too Short!')
-    .max(50, 'The "Name" is too Long!')
-    .required('The "Name" is Required field!'),
-  number: Yup.string()
-    .min(3, 'The "Number" is too Short!')
-    .max(50, 'The "Number" is too Long!')
-    .required('The "Number" is Required field!'),
-});
-
-const initialValues = {
-  username: '',
-  number: '',
-};
+import { addContacts } from '../../redux/contactsSlice';
+import { nanoid } from '@reduxjs/toolkit';
 
 const ContactForm = () => {
-  const usernameFieldId = useId();
-  const numberFieldId = useId();
-  const dispatch = useDispatch();
+    const dispatch = useDispatch();
+    const initialValues = { name: '', number: '' };
 
-  const handleSubmit = (values, actions) => {
-    dispatch(addContact(values.username, values.number));
-    actions.setSubmitting(false);
-    actions.resetForm();
-  };
+    const validationSchema = Yup.object({
+        name: Yup.string()
+            .min(3, 'Must be at least 3 characters')
+            .max(50, 'Must be 50 characters or less')
+            .required('Required'),
+        number: Yup.string()
+            .min(3, 'Must be at least 3 characters')
+            .max(50, 'Must be 50 characters or less')
+            .required('Required')
+    });
 
-  return (
-    <Formik
-      initialValues={initialValues}
-      onSubmit={handleSubmit}
-      validationSchema={ContactSchema}
-    >
-      {({ isSubmitting }) => (
-        <Form className={css.form}>
-          <div className={css.formInputWrapper}>
-            <label className={css.label} htmlFor={usernameFieldId}>Name</label>
-            <Field className={css.field}
-              id={usernameFieldId}
-              name="username"
-              type="text"
-              placeholder="Enter your name"
-            />
-            <ErrorMessage name="username" component="div" className={css.error} />
-          </div>
-          <div className={css.formInputWrapper}>
-            <label className={css.label} htmlFor={numberFieldId}>Number</label>
-            <Field className={css.field}
-              id={numberFieldId}
-              name="number"
-              type="text"
-              placeholder="Enter your number"
-            />
-            <ErrorMessage name="number" component="div" className={css.error} />
-          </div>
-          <button className={css.btn} type="submit" disabled={isSubmitting}>Add Contact</button>
-        </Form>
-      )}
-    </Formik>
-  );
+    const handleSubmit = (values, { resetForm }) => {
+        const newContact = { name: values.name, number: values.number, id: nanoid() }
+        dispatch(addContacts(newContact));
+        resetForm();
+    };
+
+    return (
+        <div className={css.form}>
+            <Formik
+                initialValues={initialValues}
+                validationSchema={validationSchema}
+                onSubmit={handleSubmit}
+            >
+                <Form>
+                    <label className = {css.label} htmlFor="name">Name
+                        <Field className = {css.field} name="name" type='search' id="name" autoComplete="name" />
+                    </label>
+                    <ErrorMessage name="name" component="div" className={css.error} />
+
+                    <label className = {css.label} htmlFor="number">Number
+                        <Field className = {css.field} name="number" type='search' id="number" autoComplete="tel" />
+                    </label>
+                    <ErrorMessage name="number" component="div" className={css.error} />
+
+                    <button className = {css.btn} type="submit">Add contact</button>
+                </Form>
+            </Formik>
+        </div>
+    );
 };
 
 export default ContactForm;
